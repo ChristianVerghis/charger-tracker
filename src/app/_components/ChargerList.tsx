@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import type { EVModel } from '@/ev/types';
+import { stationCompatibleWith } from '@/lib/filters';
+import { approxKm, type LatLng } from '@/lib/geo';
 import {
   CONNECTION_TYPE_NAMES,
   DC_CONNECTION_TYPES,
@@ -12,18 +14,19 @@ import {
   tier,
   type SlimPoi,
 } from '@/lib/snapshot-types';
-import { stationCompatibleWith } from '@/lib/filters';
 
 export function ChargerList({
   pois,
   selectedId,
   onSelect,
   ev,
+  userLocation,
 }: {
   pois: SlimPoi[];
   selectedId: number | null;
   onSelect: (id: number) => void;
   ev: EVModel | null;
+  userLocation?: LatLng | null;
 }) {
   const [query, setQuery] = useState('');
   const trimmed = query.trim().toLowerCase();
@@ -41,13 +44,23 @@ export function ChargerList({
           return false;
         })
       : pois;
+    if (userLocation) {
+      // Decorate-sort-undecorate: compute the distance once per station,
+      // sort by it, drop the helper field. Avoids recomputing in compare.
+      const decorated = filtered.map((p) => ({
+        p,
+        d: approxKm(userLocation, { lat: p.lat, lng: p.lng }),
+      }));
+      decorated.sort((a, b) => a.d - b.d);
+      return decorated.map(({ p }) => p);
+    }
     return [...filtered].sort((a, b) => {
       const ka = maxKw(a);
       const kb = maxKw(b);
       if (ka !== kb) return kb - ka;
       return a.name.localeCompare(b.name);
     });
-  }, [pois, trimmed]);
+  }, [pois, trimmed, userLocation]);
 
   return (
     <div className="flex h-full flex-col">
@@ -81,6 +94,9 @@ export function ChargerList({
             const network =
               p.op != null ? (NETWORK_NAMES[p.op] ?? `Operator ${p.op}`) : 'Unknown operator';
             const dcCounts = countDcConnectors(p);
+            const km = userLocation
+              ? approxKm(userLocation, { lat: p.lat, lng: p.lng })
+              : null;
 
             return (
               <li key={p.id}>
@@ -102,6 +118,7 @@ export function ChargerList({
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="truncate font-medium text-slate-100">{p.name}</p>
                       <span className="shrink-0 text-xs font-semibold text-slate-200">
+                        {km != null ? `${km.toFixed(1)} km · ` : ''}
                         {kw || '—'} kW
                       </span>
                     </div>

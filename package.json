@@ -18,6 +18,7 @@
     "seed:ev-models": "tsx scripts/seed-ev-models.ts",
     "prepare:prototype": "tsx scripts/prepare-prototype.ts",
     "prepare:web": "tsx scripts/prepare-web-snapshot.ts",
+    "diff:snapshots": "tsx scripts/diff-snapshots.ts",
     "dev:prototype": "tsx scripts/prepare-prototype.ts && serve prototype -l 5173",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EV_MODELS } from '@/lib/ev-models-data';
 import { applyFilter, isFilterKey, type FilterKey } from '@/lib/filters';
+import type { LatLng } from '@/lib/geo';
 import { hasDcfc, type SlimPoi } from '@/lib/snapshot-types';
 import { ChargerList } from './ChargerList';
 import { ChargerMap } from './ChargerMap';
@@ -88,6 +89,26 @@ export function ChargerExplorer() {
 
   const [startSoc, setStartSoc] = useState(20);
   const [targetSoc, setTargetSoc] = useState(80);
+  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
+  const [geoState, setGeoState] = useState<'idle' | 'pending' | 'denied' | 'unavailable'>('idle');
+
+  const requestLocation = useCallback(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGeoState('unavailable');
+      return;
+    }
+    setGeoState('pending');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoState('idle');
+      },
+      (err) => {
+        setGeoState(err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable');
+      },
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 60_000 },
+    );
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -98,6 +119,9 @@ export function ChargerExplorer() {
         onFilterChange={(next) => setParam({ filter: next === 'all' ? null : next })}
         view={view}
         onViewChange={(next) => setParam({ view: next === 'map' ? null : next })}
+        userLocation={userLocation}
+        geoState={geoState}
+        onRequestLocation={requestLocation}
       />
       <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
         <section className="flex flex-1 flex-col overflow-hidden">
@@ -127,6 +151,7 @@ export function ChargerExplorer() {
                 pois={visible}
                 selectedId={selectedId}
                 onSelect={(id) => setParam({ station: String(id) })}
+                userLocation={userLocation}
               />
             ) : (
               <ChargerList
@@ -134,6 +159,7 @@ export function ChargerExplorer() {
                 selectedId={selectedId}
                 onSelect={(id) => setParam({ station: String(id) })}
                 ev={ev}
+                userLocation={userLocation}
               />
             )}
           </div>

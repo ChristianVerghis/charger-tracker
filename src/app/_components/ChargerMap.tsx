@@ -1,7 +1,8 @@
 'use client';
 
-import maplibregl, { type GeoJSONSource, type Map as MapLibreMap } from 'maplibre-gl';
+import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type Marker } from 'maplibre-gl';
 import { useEffect, useMemo, useRef } from 'react';
+import type { LatLng } from '@/lib/geo';
 import type { SlimPoi } from '@/lib/snapshot-types';
 import { hasDcfc, maxKw, tier, TIER_COLORS } from '@/lib/snapshot-types';
 
@@ -48,13 +49,16 @@ export function ChargerMap({
   pois,
   selectedId,
   onSelect,
+  userLocation,
 }: {
   pois: SlimPoi[];
   selectedId: number | null;
   onSelect: (id: number) => void;
+  userLocation?: LatLng | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const userMarkerRef = useRef<Marker | null>(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
 
@@ -206,6 +210,36 @@ export function ChargerMap({
     if (map.isStyleLoaded()) apply();
     else map.once('load', apply);
   }, [selectedId, pois]);
+
+  // User-location marker: create when we first get a fix, move when it
+  // changes, remove when cleared. Pan/zoom in only when the location is
+  // outside the current viewport — same rule as the selected-station pan.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!userLocation) {
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
+      return;
+    }
+    const lngLat: [number, number] = [userLocation.lng, userLocation.lat];
+    if (!userMarkerRef.current) {
+      const el = document.createElement('div');
+      el.style.width = '14px';
+      el.style.height = '14px';
+      el.style.borderRadius = '9999px';
+      el.style.background = '#38bdf8';
+      el.style.border = '3px solid #0b0f14';
+      el.style.boxShadow = '0 0 0 4px rgba(56,189,248,0.25)';
+      el.setAttribute('aria-label', 'Your location');
+      userMarkerRef.current = new maplibregl.Marker({ element: el }).setLngLat(lngLat).addTo(map);
+    } else {
+      userMarkerRef.current.setLngLat(lngLat);
+    }
+    if (!map.getBounds().contains(lngLat)) {
+      map.easeTo({ center: lngLat, zoom: Math.max(map.getZoom(), 12), duration: 800 });
+    }
+  }, [userLocation]);
 
   return <div ref={containerRef} className="absolute inset-0" aria-label="map" />;
 }
