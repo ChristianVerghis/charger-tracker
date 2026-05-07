@@ -181,10 +181,13 @@ export function ChargerMap({
     else map.once('load', apply);
   }, [data]);
 
-  // Highlight the selected station on the map.
+  // Highlight + pan to the selected station. Only pan when the station is
+  // outside the current viewport so clicking a visible marker doesn't jolt
+  // the camera, but landing on a `?station=` permalink does fly to it.
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const station = selectedId != null ? pois.find((p) => p.id === selectedId) : null;
     const apply = () => {
       if (!map.getLayer('unclustered-selected')) return;
       map.setFilter('unclustered-selected', [
@@ -192,10 +195,17 @@ export function ChargerMap({
         ['!', ['has', 'point_count']],
         ['==', ['get', 'id'], selectedId ?? -1],
       ]);
+      if (station && !map.getBounds().contains([station.lng, station.lat])) {
+        map.easeTo({
+          center: [station.lng, station.lat],
+          zoom: Math.max(map.getZoom(), 13),
+          duration: 800,
+        });
+      }
     };
     if (map.isStyleLoaded()) apply();
     else map.once('load', apply);
-  }, [selectedId]);
+  }, [selectedId, pois]);
 
   return <div ref={containerRef} className="absolute inset-0" aria-label="map" />;
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { estimateChargeTime } from '@/ev/charge-time';
 import { checkCompatibility } from '@/ev/connectors';
 import type { Connector, EVModel } from '@/ev/types';
@@ -108,13 +109,14 @@ export function StationDetail({
             ✕
           </button>
         </div>
-        <div className="mt-1 flex items-center gap-2">
+        <div className="mt-1 flex flex-wrap items-center gap-2">
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TIER_BADGE[stationTier]}`}
           >
             {stationKw} kW
           </span>
           <p className="text-xs text-slate-500">{networkName}</p>
+          <ShareLinkButton />
         </div>
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
@@ -242,6 +244,29 @@ function SocSlider({
         className="mt-1 w-full accent-emerald-500"
       />
     </label>
+  );
+}
+
+function ShareLinkButton() {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard can fail in non-secure contexts; fall through silently.
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      className="ml-auto rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-200 hover:bg-slate-700"
+      aria-label="Copy share link to clipboard"
+    >
+      {copied ? 'Copied ✓' : 'Copy link'}
+    </button>
   );
 }
 
