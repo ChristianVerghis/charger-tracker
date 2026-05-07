@@ -18,7 +18,9 @@ export function AboutDialog() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-md border border-slate-700 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className="rounded-md border border-slate-700 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
       >
         About
       </button>

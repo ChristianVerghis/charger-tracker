@@ -53,9 +53,10 @@ export function TopControls({
                 type="button"
                 onClick={() => onFilterChange(key)}
                 disabled={compatNeedsEv}
+                aria-pressed={active}
                 title={compatNeedsEv ? 'Pick a vehicle first' : undefined}
                 className={
-                  'rounded-full px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ' +
+                  'rounded-full px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-40 ' +
                   (active
                     ? 'bg-emerald-500 text-slate-950'
                     : 'bg-slate-800 text-slate-200 hover:bg-slate-700')

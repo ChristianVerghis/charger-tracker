@@ -55,6 +55,22 @@ export function ChargerExplorer() {
     if (filter === 'compat' && !ev) setParam({ filter: null });
   }, [ev, filter, setParam]);
 
+  // Escape closes the detail panel (when one is open). Native <dialog> handles
+  // its own Escape; we skip when a dialog is open so we don't fight it.
+  useEffect(() => {
+    if (selectedId == null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (document.querySelector('dialog[open]')) return;
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      setParam({ station: null });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedId, setParam]);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['snapshot'],
     queryFn: fetchSnapshot,

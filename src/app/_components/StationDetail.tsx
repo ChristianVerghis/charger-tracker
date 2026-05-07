@@ -129,14 +129,24 @@ export function StationDetail({
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
         </p>
-        <a
-          href={mapsUrlFor(station)}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400"
-        >
-          <span aria-hidden>↗</span> Open in Maps
-        </a>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <a
+            href={mapsUrlFor(station)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+          >
+            <span aria-hidden>↗</span> Open in Maps
+          </a>
+          <a
+            href={`https://openchargemap.org/site/poi/details/${station.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-slate-400 underline-offset-2 hover:text-slate-200 hover:underline"
+          >
+            View on Open Charge Map
+          </a>
+        </div>
       </header>
 
       <section>
@@ -279,10 +289,12 @@ function ShareLinkButton() {
     <button
       type="button"
       onClick={onCopy}
-      className="ml-auto rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-200 hover:bg-slate-700"
+      className="ml-auto rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-200 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
       aria-label="Copy share link to clipboard"
     >
-      {state === 'copied' ? 'Copied ✓' : state === 'failed' ? 'Copy failed' : 'Copy link'}
+      <span aria-live="polite">
+        {state === 'copied' ? 'Copied ✓' : state === 'failed' ? 'Copy failed' : 'Copy link'}
+      </span>
     </button>
   );
 }
