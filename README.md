@@ -1,7 +1,8 @@
 # charger-tracker
 
-Hamilton/GTA EV charger reliability and insight tracker. See the canonical spec:
-`../Projects/EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md`.
+Hamilton/GTA EV charger reliability and insight tracker. See the canonical spec
+in the planning vault (private repo `ChristianVerghis/EVProject`):
+`../EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md`.
 
 ## Status
 

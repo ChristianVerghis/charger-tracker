@@ -2,7 +2,7 @@
   "name": "charger-tracker",
   "version": "0.0.1",
   "private": true,
-  "description": "Hamilton/GTA EV charger reliability and insight tracker — see ../Projects/EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md",
+  "description": "Hamilton/GTA EV charger reliability and insight tracker — see ../EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md",
   "type": "module",
   "engines": {
     "node": ">=20"
