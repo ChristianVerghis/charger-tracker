@@ -32,6 +32,14 @@ function bestDcfcKw(conns: SlimConnection[]): number {
     .reduce((m, c) => Math.max(m, c.kw ?? 0), 0);
 }
 
+function mapsUrlFor(p: SlimPoi): string {
+  // Google Maps universal URL. iOS opens in Apple Maps via the universal link
+  // when the user has it set as default; otherwise stays on Google Maps web.
+  // Kept simple — a `geo:` URI works on Android but not iOS Safari.
+  const q = encodeURIComponent(`${p.name}, ${p.addr || ''} ${p.town}`.trim());
+  return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&query_place_id=&q=${q}`;
+}
+
 function bestDcfcConnector(conns: SlimConnection[]): Connector | null {
   const dc = conns.filter((c) => DC_CONNECTION_TYPES.has(c.type));
   if (dc.length === 0) return null;
@@ -121,6 +129,14 @@ export function StationDetail({
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
         </p>
+        <a
+          href={mapsUrlFor(station)}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400"
+        >
+          <span aria-hidden>↗</span> Open in Maps
+        </a>
       </header>
 
       <section>
@@ -248,14 +264,15 @@ function SocSlider({
 }
 
 function ShareLinkButton() {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard can fail in non-secure contexts; fall through silently.
+    const url = window.location.href;
+    if (await copyToClipboard(url)) {
+      setState('copied');
+      setTimeout(() => setState('idle'), 1500);
+    } else {
+      setState('failed');
+      setTimeout(() => setState('idle'), 2500);
     }
   };
   return (
@@ -265,9 +282,37 @@ function ShareLinkButton() {
       className="ml-auto rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-200 hover:bg-slate-700"
       aria-label="Copy share link to clipboard"
     >
-      {copied ? 'Copied ✓' : 'Copy link'}
+      {state === 'copied' ? 'Copied ✓' : state === 'failed' ? 'Copy failed' : 'Copy link'}
     </button>
   );
+}
+
+async function copyToClipboard(text: string): Promise<boolean> {
+  // Modern path: navigator.clipboard. Requires a secure context (HTTPS or
+  // localhost). Falls back to the textarea + execCommand trick for older
+  // browsers and a few iOS in-app webviews where the modern API is missing.
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // fall through to legacy path
+    }
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
 }
 
 function Legend() {

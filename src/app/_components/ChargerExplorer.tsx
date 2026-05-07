@@ -105,6 +105,7 @@ export function ChargerExplorer() {
             )}
           </div>
           <div className="relative flex-1">
+            {(isLoading || error) && <LoadOverlay error={!!error} />}
             {view === 'map' ? (
               <ChargerMap
                 pois={visible}
@@ -132,6 +133,32 @@ export function ChargerExplorer() {
             onClearStation={() => setParam({ station: null })}
           />
         </aside>
+      </div>
+    </div>
+  );
+}
+
+function LoadOverlay({ error }: { error: boolean }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+      <div className="pointer-events-auto rounded-lg border border-slate-800 bg-slate-950/85 px-4 py-3 text-sm text-slate-200 shadow-xl backdrop-blur">
+        {error ? (
+          <div className="flex items-center gap-3">
+            <span className="text-amber-400">⚠</span>
+            <span>
+              Couldn't load the charger snapshot. Try refreshing — if it keeps failing, the issue is
+              likely on our side.
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span
+              className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"
+              aria-hidden
+            />
+            <span>Loading 1,800+ chargers across Hamilton & the GTA…</span>
+          </div>
+        )}
       </div>
     </div>
   );

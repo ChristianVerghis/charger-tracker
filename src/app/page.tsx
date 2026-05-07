@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
+import { AboutDialog } from './_components/AboutDialog';
 import { ChargerExplorer } from './_components/ChargerExplorer';
+import { Footer } from './_components/Footer';
 
 export default function HomePage() {
   return (
@@ -14,11 +16,12 @@ export default function HomePage() {
             Open-data EV chargers. Pick your car for charge-time estimates. v1 preview.
           </p>
         </div>
-        <span className="text-xs text-slate-500">v1 preview · open-data only</span>
+        <AboutDialog />
       </header>
       <Suspense fallback={<div className="flex-1 p-4 text-sm text-slate-400">Loading…</div>}>
         <ChargerExplorer />
       </Suspense>
+      <Footer />
     </main>
   );
 }
