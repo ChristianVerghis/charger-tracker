@@ -1,0 +1,47 @@
+{
+  "name": "charger-tracker",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Hamilton/GTA EV charger reliability and insight tracker — see ../Projects/EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "ingest:ocm": "tsx scripts/ingest-ocm.ts",
+    "fetch:ocm-reference": "tsx scripts/fetch-ocm-reference.ts",
+    "upsert:ocm": "tsx scripts/upsert-from-ocm.ts",
+    "seed:ev-models": "tsx scripts/seed-ev-models.ts",
+    "prepare:prototype": "tsx scripts/prepare-prototype.ts",
+    "prepare:web": "tsx scripts/prepare-web-snapshot.ts",
+    "dev:prototype": "tsx scripts/prepare-prototype.ts && serve prototype -l 5173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "serve": "^14.2.4",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.46.2",
+    "@tanstack/react-query": "^5.62.0",
+    "dotenv": "^16.4.7",
+    "maplibre-gl": "^4.7.1",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.1"
+  }
+}

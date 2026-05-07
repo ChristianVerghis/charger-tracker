@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Charger Tracker — Hamilton/GTA prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>charger-tracker · Hamilton/GTA prototype</h1>
+      <div id="stats">Loading…</div>
+    </header>
+
+    <div id="filters">
+      <button class="filter active" data-filter="all">All</button>
+      <button class="filter" data-filter="dcfc">DCFC only</button>
+      <button class="filter" data-filter="fast">≥150 kW</button>
+      <button class="filter" data-filter="hamilton">Hamilton</button>
+    </div>
+
+    <main>
+      <div id="map"></div>
+      <aside id="detail">
+        <p class="muted">Click a station marker to see its connectors.</p>
+      </aside>
+    </main>
+
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

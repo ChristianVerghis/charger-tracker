@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-fast: #10b981;
+  --color-slow-dc: #f59e0b;
+  --color-l2: #3b82f6;
+}
+
+html,
+body {
+  height: 100%;
+  background: #0b0f14;
+  color: #e6edf3;
+}
+
+.maplibregl-popup-content {
+  background: #11161d;
+  color: #e6edf3;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #11161d !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: rgba(11, 15, 20, 0.7) !important;
+  color: #94a3b8 !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: #cbd5e1 !important;
+}

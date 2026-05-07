@@ -1,0 +1,31 @@
+make,model,year,trim,battery_kwh_usable,max_dcfc_kw,connector,charge_10_to_80_min,notes
+Tesla,Model Y,2024,Long Range AWD,75,250,J3400,28,V3 Supercharger; CCS1 via adapter
+Tesla,Model 3,2024,Long Range,75,250,J3400,28,V3 Supercharger; CCS1 via adapter
+Tesla,Model Y,2025,Standard Range,60,175,J3400,28,LFP pack
+Hyundai,Ioniq 5,2024,Preferred LR AWD,77.4,235,CCS1,18,800V architecture
+Hyundai,Ioniq 6,2024,Preferred LR AWD,77.4,235,CCS1,18,800V architecture
+Kia,EV6,2024,GT-Line AWD,77.4,235,CCS1,18,800V architecture
+Kia,EV9,2024,Land,99.8,235,CCS1,24,3-row 800V SUV
+Genesis,GV60,2024,Performance AWD,77.4,235,CCS1,18,800V architecture
+Ford,Mustang Mach-E,2024,Premium ER AWD,91,150,CCS1,38,
+Ford,F-150 Lightning,2024,XLT ER,131,150,CCS1,41,
+Chevrolet,Equinox EV,2024,2LT,85,150,CCS1,40,Ultium
+Chevrolet,Blazer EV,2024,2LT AWD,85,190,CCS1,40,Ultium
+Cadillac,Lyriq,2024,Luxury AWD,102,190,CCS1,35,Ultium
+Honda,Prologue,2024,Touring AWD,85,155,CCS1,35,GM Ultium platform
+Acura,ZDX,2024,A-Spec AWD,102,190,CCS1,42,GM Ultium platform
+Volkswagen,ID.4,2024,Pro S AWD,82,175,CCS1,28,
+Audi,Q4 e-tron,2024,55 quattro,82,175,CCS1,28,VW MEB platform
+BMW,i4,2024,M50 xDrive,81,200,CCS1,31,
+BMW,iX,2024,xDrive50,105,195,CCS1,35,
+Polestar,Polestar 2,2024,LR Dual Motor,78,155,CCS1,28,
+Volvo,XC40 Recharge,2024,Twin AWD,78,150,CCS1,28,renamed EX40 in some markets
+Mercedes-Benz,EQE Sedan,2024,350 4MATIC,90,170,CCS1,32,
+Mercedes-Benz,EQS Sedan,2024,450 4MATIC,108,200,CCS1,31,
+Rivian,R1T,2024,Dual Large,135,220,CCS1,33,J3400 native from 2025
+Rivian,R1S,2024,Dual Large,135,220,CCS1,33,J3400 native from 2025
+Lucid,Air,2024,Touring,118,300,CCS1,22,924V architecture
+Nissan,Ariya,2024,Engage+ AWD,87,130,CCS1,35,
+Nissan,LEAF,2024,SV Plus,60,100,CHAdeMO,45,last mainstream CHAdeMO seller
+Toyota,bZ4X,2024,XLE AWD,71.4,150,CCS1,30,shared platform with Solterra
+Subaru,Solterra,2024,Limited AWD,71.4,100,CCS1,35,shared platform with bZ4X
