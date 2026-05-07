@@ -1,10 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { estimateChargeTime } from '@/ev/charge-time';
 import { checkCompatibility } from '@/ev/connectors';
-import type { Connector } from '@/ev/types';
-import { EV_MODELS } from '@/lib/ev-models-data';
+import type { Connector, EVModel } from '@/ev/types';
 import {
   CONNECTION_TYPE_NAMES,
   CONNECTION_TYPE_TO_CONNECTOR,
@@ -40,20 +38,32 @@ function bestDcfcConnector(conns: SlimConnection[]): Connector | null {
   return CONNECTION_TYPE_TO_CONNECTOR[top.type] ?? null;
 }
 
-export function StationDetail({ station }: { station: SlimPoi | null }) {
-  const [selectedEvId, setSelectedEvId] = useState<string>('');
-  const [startSoc, setStartSoc] = useState(20);
-  const [targetSoc, setTargetSoc] = useState(80);
-  const selectedEv = useMemo(
-    () => EV_MODELS.find((m) => m.id === selectedEvId) ?? null,
-    [selectedEvId],
-  );
-
+export function StationDetail({
+  station,
+  ev,
+  startSoc,
+  targetSoc,
+  onStartSocChange,
+  onTargetSocChange,
+  onClearStation,
+}: {
+  station: SlimPoi | null;
+  ev: EVModel | null;
+  startSoc: number;
+  targetSoc: number;
+  onStartSocChange: (v: number) => void;
+  onTargetSocChange: (v: number) => void;
+  onClearStation: () => void;
+}) {
   if (!station) {
     return (
       <div className="p-4 text-sm text-slate-400">
         <p className="mb-2 font-medium text-slate-200">No station selected.</p>
-        <p>Tap a coloured dot on the map to see its connectors and a charge-time estimate.</p>
+        <p>
+          {ev
+            ? `Tap a station to see how long this charger would take for your ${ev.make} ${ev.model}.`
+            : 'Pick your EV in the bar above, then tap a station for an estimated charge time.'}
+        </p>
         <Legend />
       </div>
     );
@@ -64,40 +74,51 @@ export function StationDetail({ station }: { station: SlimPoi | null }) {
   const dcfcKw = bestDcfcKw(station.conns);
   const stationConnector = bestDcfcConnector(station.conns);
   const networkName =
-    station.op != null ? (NETWORK_NAMES[station.op] ?? `Operator ${station.op}`) : 'Unknown operator';
+    station.op != null
+      ? (NETWORK_NAMES[station.op] ?? `Operator ${station.op}`)
+      : 'Unknown operator';
 
   const compatibility =
-    selectedEv && stationConnector
-      ? checkCompatibility(selectedEv.connector, stationConnector)
-      : null;
+    ev && stationConnector ? checkCompatibility(ev.connector, stationConnector) : null;
 
   const showEstimate =
-    selectedEv && dcfcKw > 0 && targetSoc > startSoc && (compatibility?.compatible ?? false);
+    !!ev && dcfcKw > 0 && targetSoc > startSoc && (compatibility?.compatible ?? false);
 
-  const estimate = showEstimate
-    ? estimateChargeTime({
-        ev: selectedEv,
-        startSocPct: startSoc,
-        targetSocPct: targetSoc,
-        chargerMaxKw: dcfcKw,
-      })
-    : null;
+  const estimate =
+    showEstimate && ev
+      ? estimateChargeTime({
+          ev,
+          startSocPct: startSoc,
+          targetSocPct: targetSoc,
+          chargerMaxKw: dcfcKw,
+        })
+      : null;
 
   return (
     <div className="flex flex-col gap-4 p-4 text-sm">
       <header>
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-base font-semibold text-slate-100">{station.name}</h2>
+          <button
+            type="button"
+            onClick={onClearStation}
+            className="shrink-0 rounded p-1 text-slate-500 hover:bg-slate-900 hover:text-slate-200"
+            aria-label="Close station detail"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="mt-1 flex items-center gap-2">
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TIER_BADGE[stationTier]}`}
           >
             {stationKw} kW
           </span>
+          <p className="text-xs text-slate-500">{networkName}</p>
         </div>
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
         </p>
-        <p className="mt-1 text-xs text-slate-500">{networkName}</p>
       </header>
 
       <section>
@@ -130,65 +151,62 @@ export function StationDetail({ station }: { station: SlimPoi | null }) {
         <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">
           Charge-time estimate
         </h3>
-        <label className="mb-2 block">
-          <span className="text-xs text-slate-400">Your EV</span>
-          <select
-            value={selectedEvId}
-            onChange={(e) => setSelectedEvId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-slate-100"
-          >
-            <option value="">— pick a vehicle —</option>
-            {EV_MODELS.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.year} {m.make} {m.model}
-                {m.trim ? ` · ${m.trim}` : ''}
-              </option>
-            ))}
-          </select>
-        </label>
 
-        <div className="grid grid-cols-2 gap-3">
-          <SocSlider label="Start" value={startSoc} onChange={setStartSoc} max={targetSoc - 5} />
-          <SocSlider label="Target" value={targetSoc} onChange={setTargetSoc} max={100} min={startSoc + 5} />
-        </div>
+        {!ev && (
+          <p className="rounded-md border border-slate-800 bg-slate-900/50 p-3 text-xs text-slate-500">
+            Pick a vehicle in the bar above to see how long this charger would take.
+          </p>
+        )}
 
-        <div className="mt-3 rounded-md border border-slate-800 bg-slate-900/50 p-3">
-          {!selectedEv && (
-            <p className="text-xs text-slate-500">
-              Pick a vehicle above to see how long this charger would take.
-            </p>
-          )}
-          {selectedEv && dcfcKw === 0 && (
-            <p className="text-xs text-amber-300">
-              No DC fast-charging at this station — no useful estimate for {selectedEv.make}{' '}
-              {selectedEv.model}.
-            </p>
-          )}
-          {selectedEv && dcfcKw > 0 && compatibility && !compatibility.compatible && (
-            <p className="text-xs text-amber-300">
-              {compatibility.notes.join(' ')}
-            </p>
-          )}
-          {selectedEv && estimate && (
-            <div className="space-y-1.5">
-              <p className="text-slate-100">
-                <strong className="text-emerald-300">{Math.round(estimate.minutes)} min</strong> to
-                go from {estimate.startSocPct}% → {estimate.targetSocPct}%
-              </p>
-              <p className="text-xs text-slate-400">
-                Adds ~{Math.round(estimate.energyAddedKwh)} kWh ·{' '}
-                ~{Math.round(estimate.rangeAddedKm)} km · effective rate{' '}
-                {Math.round(estimate.effectiveKw)} kW
-                {compatibility && !compatibility.native ? ' · adapter required' : ''}
-              </p>
-              {estimate.notes.map((n, i) => (
-                <p key={i} className="text-xs text-slate-500">
-                  {n}
-                </p>
-              ))}
+        {ev && (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <SocSlider
+                label="Start"
+                value={startSoc}
+                onChange={onStartSocChange}
+                max={Math.max(0, targetSoc - 5)}
+              />
+              <SocSlider
+                label="Target"
+                value={targetSoc}
+                onChange={onTargetSocChange}
+                max={100}
+                min={Math.min(100, startSoc + 5)}
+              />
             </div>
-          )}
-        </div>
+
+            <div className="mt-3 rounded-md border border-slate-800 bg-slate-900/50 p-3">
+              {dcfcKw === 0 && (
+                <p className="text-xs text-amber-300">
+                  No DC fast-charging at this station — no useful estimate for {ev.make} {ev.model}.
+                </p>
+              )}
+              {dcfcKw > 0 && compatibility && !compatibility.compatible && (
+                <p className="text-xs text-amber-300">{compatibility.notes.join(' ')}</p>
+              )}
+              {estimate && (
+                <div className="space-y-1.5">
+                  <p className="text-slate-100">
+                    <strong className="text-emerald-300">{Math.round(estimate.minutes)} min</strong>{' '}
+                    to go from {estimate.startSocPct}% → {estimate.targetSocPct}%
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Adds ~{Math.round(estimate.energyAddedKwh)} kWh ·{' '}
+                    ~{Math.round(estimate.rangeAddedKm)} km · effective rate{' '}
+                    {Math.round(estimate.effectiveKw)} kW
+                    {compatibility && !compatibility.native ? ' · adapter required' : ''}
+                  </p>
+                  {estimate.notes.map((n, i) => (
+                    <p key={i} className="text-xs text-slate-500">
+                      {n}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </section>
 
       <Legend />

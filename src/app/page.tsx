@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ChargerExplorer } from './_components/ChargerExplorer';
 
 export default function HomePage() {
@@ -15,7 +16,9 @@ export default function HomePage() {
         </div>
         <span className="text-xs text-slate-500">v1 preview · open-data only</span>
       </header>
-      <ChargerExplorer />
+      <Suspense fallback={<div className="flex-1 p-4 text-sm text-slate-400">Loading…</div>}>
+        <ChargerExplorer />
+      </Suspense>
     </main>
   );
 }
