@@ -30,6 +30,18 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Start the snapshot fetch during JS parse, before TanStack Query kicks
+            in. Saves ~100-300 ms on cold loads — the snapshot is on the
+            critical path for both the map and the list. */}
+        <link
+          rel="preload"
+          as="fetch"
+          href="/data/snapshot.json"
+          crossOrigin="anonymous"
+          type="application/json"
+        />
+      </head>
       <body className="min-h-screen antialiased">
         <QueryProvider>{children}</QueryProvider>
       </body>

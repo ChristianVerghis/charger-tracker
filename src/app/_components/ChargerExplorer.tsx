@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EV_MODELS } from '@/lib/ev-models-data';
 import { applyFilter, isFilterKey, type FilterKey } from '@/lib/filters';
 import type { LatLng } from '@/lib/geo';
+import { pushRecent } from '@/lib/recently-viewed';
 import { hasDcfc, type SlimPoi } from '@/lib/snapshot-types';
 import { ChargerList } from './ChargerList';
 import { ChargerMap } from './ChargerMap';
@@ -81,6 +82,12 @@ export function ChargerExplorer({ initialStationId }: { initialStationId?: numbe
     if (filter === 'compat' && !ev) setParam({ filter: null });
   }, [ev, filter, setParam]);
 
+  // Track the selected station in localStorage so the empty-state can show
+  // a "recently viewed" hint on the user's next visit.
+  useEffect(() => {
+    if (selectedId != null) pushRecent(selectedId);
+  }, [selectedId]);
+
   // Escape closes the detail panel (when one is open). Native <dialog> handles
   // its own Escape; we skip when a dialog is open so we don't fight it.
   useEffect(() => {
@@ -111,6 +118,19 @@ export function ChargerExplorer({ initialStationId }: { initialStationId?: numbe
     () => (data ? (data.find((p) => p.id === selectedId) ?? null) : null),
     [data, selectedId],
   );
+
+  // Read-once on mount; the list doesn't need to update reactively because
+  // the empty state only renders when no station is selected.
+  const [recentIds, setRecentIds] = useState<number[]>([]);
+  useEffect(() => {
+    import('@/lib/recently-viewed').then(({ readRecent }) => setRecentIds(readRecent()));
+  }, []);
+  const recentStations = useMemo(() => {
+    if (!data) return [];
+    return recentIds
+      .map((id) => data.find((p) => p.id === id))
+      .filter((p): p is SlimPoi => !!p && p.id !== selectedId);
+  }, [data, recentIds, selectedId]);
 
   const [startSoc, setStartSoc] = useState(20);
   const [targetSoc, setTargetSoc] = useState(80);
@@ -198,6 +218,8 @@ export function ChargerExplorer({ initialStationId }: { initialStationId?: numbe
             onStartSocChange={setStartSoc}
             onTargetSocChange={setTargetSoc}
             onClearStation={() => setStation(null)}
+            recentStations={recentStations}
+            onSelectRecent={setStation}
           />
         </aside>
       </div>

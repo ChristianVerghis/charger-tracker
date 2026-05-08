@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { AboutDialog } from './_components/AboutDialog';
 import { ChargerExplorer } from './_components/ChargerExplorer';
+import { ErrorBoundary } from './_components/ErrorBoundary';
 import { Footer } from './_components/Footer';
 
 export default function HomePage() {
@@ -18,9 +19,11 @@ export default function HomePage() {
         </div>
         <AboutDialog />
       </header>
-      <Suspense fallback={<div className="flex-1 p-4 text-sm text-slate-400">Loading…</div>}>
-        <ChargerExplorer />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<div className="flex-1 p-4 text-sm text-slate-400">Loading…</div>}>
+          <ChargerExplorer />
+        </Suspense>
+      </ErrorBoundary>
       <Footer />
     </main>
   );

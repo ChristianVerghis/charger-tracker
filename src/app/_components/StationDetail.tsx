@@ -55,6 +55,8 @@ export function StationDetail({
   onStartSocChange,
   onTargetSocChange,
   onClearStation,
+  recentStations = [],
+  onSelectRecent,
 }: {
   station: SlimPoi | null;
   ev: EVModel | null;
@@ -63,6 +65,8 @@ export function StationDetail({
   onStartSocChange: (v: number) => void;
   onTargetSocChange: (v: number) => void;
   onClearStation: () => void;
+  recentStations?: SlimPoi[];
+  onSelectRecent?: (id: number) => void;
 }) {
   if (!station) {
     return (
@@ -73,6 +77,32 @@ export function StationDetail({
             ? `Tap a station to see how long this charger would take for your ${ev.make} ${ev.model}.`
             : 'Pick your EV in the bar above, then tap a station for an estimated charge time.'}
         </p>
+        {recentStations.length > 0 && onSelectRecent && (
+          <section className="mt-4 border-t border-slate-800 pt-3">
+            <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">
+              Recently viewed
+            </h3>
+            <ul className="space-y-1">
+              {recentStations.map((s) => {
+                const kw = maxKw(s);
+                return (
+                  <li key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => onSelectRecent(s.id)}
+                      className="flex w-full items-baseline justify-between gap-2 rounded px-1.5 py-1 text-left hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                    >
+                      <span className="truncate text-sm text-slate-200">{s.name}</span>
+                      <span className="shrink-0 text-xs text-slate-500">
+                        {kw || '—'} kW · {s.town}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
         <Legend />
       </div>
     );
