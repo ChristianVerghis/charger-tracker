@@ -18,17 +18,28 @@ async function fetchSnapshot(): Promise<SlimPoi[]> {
   return (await res.json()) as SlimPoi[];
 }
 
-export function ChargerExplorer() {
+export function ChargerExplorer({ initialStationId }: { initialStationId?: number } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // URL is the source of truth for ev / filter / station / view.
+  // URL is the source of truth. The selected station can come from either:
+  //   - the path (`/station/[id]`) — set by `initialStationId` from the
+  //     server-rendered page, used for share-links so each station has its
+  //     own OG card and metadata.
+  //   - the `?station=` query param — supports backwards-compat permalinks
+  //     that pre-date the per-station route.
+  // Path wins when both are present.
   const evParam = searchParams.get('ev') ?? '';
   const filterParam = searchParams.get('filter');
   const filter: FilterKey = isFilterKey(filterParam) ? filterParam : 'all';
   const stationParam = searchParams.get('station');
-  const selectedId = stationParam ? Number(stationParam) : null;
+  const selectedId =
+    initialStationId != null
+      ? initialStationId
+      : stationParam
+        ? Number(stationParam)
+        : null;
   const view: ViewMode = searchParams.get('view') === 'list' ? 'list' : 'map';
 
   const evId = useMemo(
@@ -50,6 +61,20 @@ export function ChargerExplorer() {
     [pathname, router, searchParams],
   );
 
+  // Selecting a station drives a path change so each station has its own
+  // route + OG card. Clearing returns to `/`. Other params (ev/filter/view)
+  // are preserved across the path change.
+  const setStation = useCallback(
+    (id: number | null) => {
+      const next = new URLSearchParams(searchParams.toString());
+      next.delete('station');
+      const qs = next.toString();
+      const path = id != null ? `/station/${id}` : '/';
+      router.replace(qs ? `${path}?${qs}` : path, { scroll: false });
+    },
+    [router, searchParams],
+  );
+
   // If the user lands with `?filter=compat` but no EV (stale permalink), or
   // unpicks the EV later, fall back to "all".
   useEffect(() => {
@@ -66,11 +91,11 @@ export function ChargerExplorer() {
       const t = e.target as HTMLElement | null;
       const tag = t?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      setParam({ station: null });
+      setStation(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedId, setParam]);
+  }, [selectedId, setStation]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['snapshot'],
@@ -150,14 +175,14 @@ export function ChargerExplorer() {
               <ChargerMap
                 pois={visible}
                 selectedId={selectedId}
-                onSelect={(id) => setParam({ station: String(id) })}
+                onSelect={setStation}
                 userLocation={userLocation}
               />
             ) : (
               <ChargerList
                 pois={visible}
                 selectedId={selectedId}
-                onSelect={(id) => setParam({ station: String(id) })}
+                onSelect={setStation}
                 ev={ev}
                 userLocation={userLocation}
               />
@@ -172,7 +197,7 @@ export function ChargerExplorer() {
             targetSoc={targetSoc}
             onStartSocChange={setStartSoc}
             onTargetSocChange={setTargetSoc}
-            onClearStation={() => setParam({ station: null })}
+            onClearStation={() => setStation(null)}
           />
         </aside>
       </div>
