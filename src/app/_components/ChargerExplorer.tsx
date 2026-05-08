@@ -1,17 +1,30 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EV_MODELS } from '@/lib/ev-models-data';
-import { applyFilter, isFilterKey, type FilterKey } from '@/lib/filters';
-import type { LatLng } from '@/lib/geo';
+import { applyFilter, isFilterKey, stationCompatibleWith, type FilterKey } from '@/lib/filters';
+import { approxKm, type LatLng } from '@/lib/geo';
 import { pushRecent } from '@/lib/recently-viewed';
-import { hasDcfc, type SlimPoi } from '@/lib/snapshot-types';
+import { hasDcfc, maxKw, type SlimPoi } from '@/lib/snapshot-types';
 import { ChargerList } from './ChargerList';
-import { ChargerMap } from './ChargerMap';
 import { StationDetail } from './StationDetail';
 import { TopControls, type ViewMode } from './TopControls';
+
+// MapLibre is ~210 KB of the bundle. Lazy-load it so initial JS download
+// (and parse) doesn't wait for it. The map area renders a skeleton during
+// the chunk fetch — typically tens of milliseconds on a warm connection.
+// ssr:false because MapLibre touches `window` at module init.
+const ChargerMap = dynamic(() => import('./ChargerMap').then((m) => m.ChargerMap), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-slate-950 text-xs text-slate-500">
+      Loading map…
+    </div>
+  ),
+});
 
 async function fetchSnapshot(): Promise<SlimPoi[]> {
   const res = await fetch('/data/snapshot.json');
@@ -155,6 +168,27 @@ export function ChargerExplorer({ initialStationId }: { initialStationId?: numbe
     );
   }, []);
 
+  // "Top fast charger near you" — highest-kW DCFC within 25 km of the user's
+  // location that's compatible with the picked EV (if one is picked). Used
+  // in the StationDetail empty state to surface a useful default action when
+  // a returning user grants geolocation.
+  const topNearby = useMemo(() => {
+    if (!data || !userLocation) return null;
+    const RADIUS_KM = 25;
+    type Candidate = { p: SlimPoi; kw: number; km: number };
+    const cands: Candidate[] = [];
+    for (const p of data) {
+      if (!hasDcfc(p)) continue;
+      if (ev && !stationCompatibleWith(p, ev)) continue;
+      const km = approxKm(userLocation, { lat: p.lat, lng: p.lng });
+      if (km > RADIUS_KM) continue;
+      cands.push({ p, kw: maxKw(p), km });
+    }
+    if (cands.length === 0) return null;
+    cands.sort((a, b) => (b.kw - a.kw) || (a.km - b.km));
+    return { station: cands[0]!.p, km: cands[0]!.km, kw: cands[0]!.kw };
+  }, [data, userLocation, ev]);
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <TopControls
@@ -220,6 +254,7 @@ export function ChargerExplorer({ initialStationId }: { initialStationId?: numbe
             onClearStation={() => setStation(null)}
             recentStations={recentStations}
             onSelectRecent={setStation}
+            topNearby={topNearby}
           />
         </aside>
       </div>

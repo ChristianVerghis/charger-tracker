@@ -18,6 +18,7 @@ type RawPoi = {
   ID: number;
   OperatorID?: number | null;
   StatusTypeID?: number | null;
+  DateLastVerified?: string | null;
   AddressInfo: {
     Title?: string;
     AddressLine1?: string;
@@ -46,6 +47,10 @@ type SlimPoi = {
   lat: number;
   lng: number;
   conns: SlimConnection[];
+  // OCM "DateLastVerified" as an ISO date — when a human last touched the
+  // record. Null when OCM omits it. Only as fresh as OCM itself; the user
+  // sees this as "Last verified N days ago" with appropriate hedging.
+  verified?: string | null;
 };
 
 function findLatestSnapshot(): string {
@@ -75,6 +80,7 @@ function slim(pois: RawPoi[]): SlimPoi[] {
       kw: c.PowerKW ?? 0,
       qty: c.Quantity ?? 1,
     })),
+    verified: p.DateLastVerified ?? null,
   }));
 }
 

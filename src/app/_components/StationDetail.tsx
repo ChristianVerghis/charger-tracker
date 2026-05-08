@@ -32,6 +32,17 @@ function bestDcfcKw(conns: SlimConnection[]): number {
     .reduce((m, c) => Math.max(m, c.kw ?? 0), 0);
 }
 
+function formatVerified(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return iso.slice(0, 10);
+  const days = Math.max(0, Math.floor((Date.now() - then) / (1000 * 60 * 60 * 24)));
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days} days ago`;
+  if (days < 365) return `${Math.round(days / 30)} months ago`;
+  return iso.slice(0, 10);
+}
+
 function mapsUrlFor(p: SlimPoi): string {
   // Google Maps universal URL. iOS opens in Apple Maps via the universal link
   // when the user has it set as default; otherwise stays on Google Maps web.
@@ -57,6 +68,7 @@ export function StationDetail({
   onClearStation,
   recentStations = [],
   onSelectRecent,
+  topNearby,
 }: {
   station: SlimPoi | null;
   ev: EVModel | null;
@@ -67,6 +79,7 @@ export function StationDetail({
   onClearStation: () => void;
   recentStations?: SlimPoi[];
   onSelectRecent?: (id: number) => void;
+  topNearby?: { station: SlimPoi; km: number; kw: number } | null;
 }) {
   if (!station) {
     return (
@@ -77,6 +90,21 @@ export function StationDetail({
             ? `Tap a station to see how long this charger would take for your ${ev.make} ${ev.model}.`
             : 'Pick your EV in the bar above, then tap a station for an estimated charge time.'}
         </p>
+        {topNearby && onSelectRecent && (
+          <button
+            type="button"
+            onClick={() => onSelectRecent(topNearby.station.id)}
+            className="mt-3 block w-full rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-left hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          >
+            <p className="text-xs font-medium uppercase tracking-wide text-emerald-300">
+              Top fast charger near you
+            </p>
+            <p className="mt-0.5 truncate text-sm text-slate-100">{topNearby.station.name}</p>
+            <p className="text-xs text-slate-400">
+              {topNearby.kw} kW · {topNearby.km.toFixed(1)} km · {topNearby.station.town}
+            </p>
+          </button>
+        )}
         {recentStations.length > 0 && onSelectRecent && (
           <section className="mt-4 border-t border-slate-800 pt-3">
             <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -159,6 +187,14 @@ export function StationDetail({
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
         </p>
+        {station.verified && (
+          <p className="mt-1 text-xs text-slate-500">
+            OCM verified {formatVerified(station.verified)}{' '}
+            <span className="text-slate-600">
+              · static metadata only, not real-time status
+            </span>
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <a
             href={mapsUrlFor(station)}

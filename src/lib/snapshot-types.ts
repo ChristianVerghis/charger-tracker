@@ -16,6 +16,11 @@ export type SlimPoi = {
   lat: number;
   lng: number;
   conns: SlimConnection[];
+  // ISO date from OCM's `DateLastVerified` (when a human last reviewed the
+  // record). Optional/null when OCM omits it. Surfaced in the UI as a
+  // hedged "Last verified N days ago" hint — never as a guarantee of
+  // operational status.
+  verified?: string | null;
 };
 
 // OCM ConnectionTypeID → display name (same map the prototype used).
