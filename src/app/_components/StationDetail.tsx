@@ -182,7 +182,7 @@ export function StationDetail({
             {stationKw} kW
           </span>
           <p className="text-xs text-slate-500">{networkName}</p>
-          <ShareLinkButton />
+          <ShareLinkButton stationName={station.name} stationKw={stationKw} />
         </div>
         <p className="mt-1 text-xs text-slate-400">
           {[station.addr, station.town].filter(Boolean).join(' · ')}
@@ -339,10 +339,33 @@ function SocSlider({
   );
 }
 
-function ShareLinkButton() {
+function ShareLinkButton({
+  stationName,
+  stationKw,
+}: {
+  stationName: string;
+  stationKw: number;
+}) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
-  const onCopy = async () => {
+  const onShare = async () => {
     const url = window.location.href;
+    // Mobile: native share sheet (iMessage / Mail / WhatsApp / Slack /
+    // anywhere registered as a share target). Desktop usually no-ops or
+    // shows a popup — falls back to clipboard.
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: `${stationName} · ${stationKw} kW`,
+          text: `${stationName} · ${stationKw} kW · charger-tracker`,
+          url,
+        });
+        return; // share-sheet handled it; no need to fall back
+      } catch (err) {
+        // AbortError = user dismissed the share sheet. Don't treat that as
+        // failure (no copy fallback). Anything else falls through.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
     if (await copyToClipboard(url)) {
       setState('copied');
       setTimeout(() => setState('idle'), 1500);
@@ -354,12 +377,12 @@ function ShareLinkButton() {
   return (
     <button
       type="button"
-      onClick={onCopy}
+      onClick={onShare}
       className="ml-auto rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-200 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-      aria-label="Copy share link to clipboard"
+      aria-label="Share this station"
     >
       <span aria-live="polite">
-        {state === 'copied' ? 'Copied ✓' : state === 'failed' ? 'Copy failed' : 'Copy link'}
+        {state === 'copied' ? 'Copied ✓' : state === 'failed' ? 'Copy failed' : 'Share'}
       </span>
     </button>
   );

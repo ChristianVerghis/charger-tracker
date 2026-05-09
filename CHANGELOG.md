@@ -10,6 +10,26 @@ without the date column on `[Unreleased]` since the deploy isn't live yet.
 ## [Unreleased]
 
 ### Added
+- Native share button (`navigator.share()` on mobile = real iMessage / Mail
+  / WhatsApp / Slack share sheet; clipboard fallback on desktop). Replaces
+  the previous Copy-link-only button on the station detail header.
+- Web App Manifest (`app/manifest.ts`) + Apple touch icon (`app/apple-icon.tsx`)
+  for iOS / Android "Add to Home Screen." Theme colour matches the app's
+  slate-950 background.
+- App-level error boundary (`app/error.tsx`) — Next.js per-route error catch
+  for server-component throws and metadata failures, complementing the
+  React-tree ErrorBoundary already in place. Shows the Vercel `digest` ref
+  for support and a `reset()` retry that re-renders without a hard reload.
+- Site-level JSON-LD on the home page (`schema.org/WebSite` + `Organization`
+  + `SearchAction`) for Google sitelinks search box; compounds with the
+  per-station `EVChargingStation` schema.
+- Vercel Speed Insights + Analytics in the root layout. Real Web Vitals
+  (LCP/CLS/INP) and traffic data once the URL goes public.
+- Dependabot config for npm + GitHub Actions (weekly, grouped). Auto-PRs
+  for security advisories so the next CVE surfaces as a PR not a deploy
+  rejection.
+- `CONTRIBUTING.md` (local setup, standards, what kinds of PRs are welcome)
+  and `SECURITY.md` (vulnerability reporting via GitHub private advisory).
 - Per-station route `/station/[id]` with dynamic Open Graph cards showing the
   station name, max kW, network, and DC connector summary.
 - "Top fast charger near you" callout in the empty state of the detail panel

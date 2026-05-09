@@ -1,0 +1,51 @@
+# Dependabot keeps npm + GitHub Actions deps fresh. Weekly schedule keeps
+# the PR firehose modest; security-only PRs land regardless of schedule.
+#
+# Grouped updates collapse the 5+ "@types/* bumped 0.0.1" PRs into one.
+# Critical/high CVEs still surface as standalone PRs because the security
+# updater runs separately from version-update.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Toronto
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      next:
+        patterns:
+          - 'next'
+          - '@next/*'
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react*'
+      types:
+        patterns:
+          - '@types/*'
+      tooling:
+        patterns:
+          - 'typescript'
+          - 'tsx'
+          - 'vitest'
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Toronto
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - github-actions
