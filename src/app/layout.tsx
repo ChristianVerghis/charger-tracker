@@ -1,3 +1,5 @@
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { QueryProvider } from './providers';
@@ -44,6 +46,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="min-h-screen antialiased">
         <QueryProvider>{children}</QueryProvider>
+        {/* Vercel-side instrumentation: Web Vitals (LCP/CLS/INP) and traffic.
+            No-ops outside Vercel; on Vercel they pipe to the project dashboard.
+            Free on Hobby tier; ~12 KB combined. */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
