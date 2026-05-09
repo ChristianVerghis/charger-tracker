@@ -16,3 +16,4 @@ prototype/snapshot.json
 .DS_Store
 .vscode/
 .idea/
+.vercel
