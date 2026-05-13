@@ -28,5 +28,5 @@
     "tests/**/*",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "data/snapshots"]
+  "exclude": ["node_modules", "data/snapshots", "**/* 2.ts", "**/* 2.tsx"]
 }
