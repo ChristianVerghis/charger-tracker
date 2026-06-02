@@ -9,8 +9,8 @@ dependencies:
     specifier: ^2.106.2
     version: 2.106.2
   '@tanstack/react-query':
-    specifier: ^5.62.0
-    version: 5.62.0(react@19.2.7)
+    specifier: ^5.100.14
+    version: 5.100.14(react@19.2.7)
   '@vercel/analytics':
     specifier: ^2.0.1
     version: 2.0.1(next@16.2.7)(react@19.2.7)
@@ -1094,16 +1094,16 @@ packages:
       tailwindcss: 4.3.0
     dev: true
 
-  /@tanstack/query-core@5.62.0:
-    resolution: {integrity: sha512-sx38bGrqF9bop92AXOvzDr0L9fWDas5zXdPglxa9cuqeVSWS7lY6OnVyl/oodfXjgOGRk79IfCpgVmxrbHuFHg==}
+  /@tanstack/query-core@5.100.14:
+    resolution: {integrity: sha512-5X41dGpxgeaHISCRW2oYwcSycZeULZzAunaudXT9ov1KOTj9xwt0CH6hbwqP1/z74ZWF7rYFnDpyYH07XFcZew==}
     dev: false
 
-  /@tanstack/react-query@5.62.0(react@19.2.7):
-    resolution: {integrity: sha512-tj2ltjAn2a3fs+Dqonlvs6GyLQ/LKVJE2DVSYW+8pJ3P6/VCVGrfqv5UEchmlP7tLOvvtZcOuSyI2ooVlR5Yqw==}
+  /@tanstack/react-query@5.100.14(react@19.2.7):
+    resolution: {integrity: sha512-oOr6aRdSFEwWhzxEkD/9ZcItM3+LjBSkeVmadWKwUssAHTsqd/7bOjWrX4AbvEkoEhgAxzN0Xk6H/aYzXiYBAw==}
     peerDependencies:
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-core': 5.62.0
+      '@tanstack/query-core': 5.100.14
       react: 19.2.7
     dev: false
 
