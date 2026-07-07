@@ -28,3 +28,6 @@ checklists:
   - { label: "v1 ship", file: "GOALS.md", section: "v1 ship" }
 blocker: "unlaunched — ship under charger-tracker.vercel.app per launch-checklist escape hatch"
 tags: [nextjs, maplibre, ev, open-data, pre-launch]
+showcase:
+  kind: app
+  href: http://localhost:3000
