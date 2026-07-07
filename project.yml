@@ -1,0 +1,30 @@
+# project.yml — dashboard manifest (auto-read by ~/dev/dashboard)
+name: charger-tracker
+kind: service
+status: dormant   # v1 feature-complete, launch checklist pending (Vercel deploy, .ca domain)
+description: Hamilton/GTA EV charger map — Next.js 16 + MapLibre over a slimmed Open Charge Map snapshot (1,813 stations), EV compatibility filters and charge-time estimates. Supabase schema written but not provisioned.
+repo: https://github.com/ChristianVerghis/charger-tracker
+port: 3000
+start: pnpm dev
+health: http://localhost:3000
+links:
+  - { label: "Open app →", href: "http://localhost:3000", primary: true }
+  - { label: "GitHub", href: "https://github.com/ChristianVerghis/charger-tracker" }
+  - { label: "Launch checklist", path: "GOALS.md" }
+  - { label: "Spec (EV-Network)", href: "/files/EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md" }
+  - { label: "Open Charge Map", href: "https://openchargemap.org/" }
+actions:
+  check: pnpm check
+  test: pnpm test
+  typecheck: pnpm typecheck
+  build: pnpm build
+  refresh-data: pnpm ingest:ocm && pnpm prepare:web
+  diff-snapshots: pnpm diff:snapshots
+freshness:
+  - { label: "station snapshot", file: "public/data/snapshot.json", warn_days: 30, fail_days: 60 }
+metrics:
+  - { label: "stations", type: file_json, file: "public/data/snapshot.json", path: "len()" }
+checklists:
+  - { label: "v1 ship", file: "GOALS.md", section: "v1 ship" }
+blocker: "unlaunched — ship under charger-tracker.vercel.app per launch-checklist escape hatch"
+tags: [nextjs, maplibre, ev, open-data, pre-launch]
