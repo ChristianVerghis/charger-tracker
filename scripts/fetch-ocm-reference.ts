@@ -23,7 +23,7 @@ async function main(): Promise<void> {
     headers: {
       'X-API-Key': apiKey,
       Accept: 'application/json',
-      'User-Agent': 'charger-tracker-poc/0.1 (+https://github.com/cverghis)',
+      'User-Agent': 'charger-tracker/0.1 (+https://github.com/ChristianVerghis/charger-tracker)',
     },
   });
 

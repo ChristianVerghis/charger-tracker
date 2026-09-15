@@ -5,9 +5,8 @@ build/
 dist/
 tsconfig.tsbuildinfo
 
-.env
-.env.local
-.env.*.local
+.env*
+!.env.example
 
 data/snapshots/
 prototype/snapshot.json

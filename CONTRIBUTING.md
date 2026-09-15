@@ -35,8 +35,8 @@ that file from a fresh OCM pull.
   in one of those.
 - **Comments only when the WHY is non-obvious.** Don't restate code.
 - **Tests live in `tests/`** as `*.test.ts`. Pure functions get unit tests;
-  React components are intentionally untested for v1 (see the build log in
-  the planning vault for the reasoning).
+  React components are intentionally untested for v1; the logic worth
+  testing lives in pure functions under `src/ev`, `src/lib`, and `src/ingest`.
 
 ## What kinds of PRs are welcome
 
@@ -51,12 +51,10 @@ that file from a fresh OCM pull.
 
 - **Major architectural changes** without prior discussion in an issue.
 - **New connector/network integrations** — these need partnership conversations
-  with the network, not just code. See `outreach/` in the planning vault for
-  the strategy. If you're at one of these networks (SWTCH, Flo, ChargeLab,
-  Ivy, ChargePoint), open a discussion.
+  with the network, not just code. If you're at one of these networks (SWTCH,
+  Flo, ChargeLab, Ivy, ChargePoint), open a discussion.
 - **Adding chargers outside Hamilton + GTA.** v1 is intentionally bounded;
-  expansion is on the v1.5+ roadmap. See `v1_plus_roadmap.md` in the
-  planning vault.
+  expansion is on the v1.5+ roadmap in `GOALS.md`.
 - **Anything that turns the site into an ad platform / lead-gen funnel /
   paid placement.** Hard no.
 
@@ -66,7 +64,7 @@ Use GitHub issues for: bug reports, EV-data corrections, feature requests
 that fit the v1.5+ roadmap.
 
 Don't use issues for: questions answerable by reading the README, demands for
-features explicitly out of scope (see `v1_plus_roadmap.md`).
+features explicitly out of scope (see `GOALS.md`).
 
 ## Reporting security issues
 

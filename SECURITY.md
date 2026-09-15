@@ -39,6 +39,6 @@ Out of scope (please don't report these):
 
 ## Preferred disclosure for partners
 
-If you're an EV-network partner (SWTCH, Flo, ChargeLab, Ivy, ChargePoint, or
+If you're a charging-network operator (SWTCH, Flo, ChargeLab, Ivy, ChargePoint, or
 otherwise) and the vulnerability concerns access to your data through this
 project, please flag it as such — we'll prioritize and route accordingly.

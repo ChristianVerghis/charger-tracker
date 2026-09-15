@@ -1,8 +1,8 @@
 # Changelog
 
 All notable user-facing changes to charger-tracker are recorded here. Internal
-refactors and tooling-only changes go in the [build log of the planning vault](../EV-Network/build_log.md);
-this file is for things a user (or a curious recruiter) would care about.
+refactors and tooling-only changes are left to the git history; this file is
+for things a user would care about.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 without the date column on `[Unreleased]` since the deploy isn't live yet.
@@ -80,7 +80,6 @@ without the date column on `[Unreleased]` since the deploy isn't live yet.
 
 ## [0.1.0] — first deployable build
 
-The build log in the planning vault has the full prose history. This entry
-exists for the initial Git commit's sake — the project was scaffolded
-2026-04-29 (spec) and the first end-to-end build (Next.js + EV-aware
+This entry exists for the initial Git commit's sake — the project was
+scaffolded 2026-04-29 and the first end-to-end build (Next.js + EV-aware
 filtering + map) shipped 2026-05-06.

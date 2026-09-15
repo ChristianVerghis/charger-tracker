@@ -33,8 +33,8 @@ export type OcmPoi = {
 };
 
 // OCM ConnectionTypeID → our connector_type enum.
-// IDs sourced from /v3/referencedata; resolved against the GTA snapshot in
-// build_log.md (2026-05-01 evening entry).
+// IDs sourced from /v3/referencedata (data/ocm-reference.json) and checked
+// against the GTA snapshot.
 export function mapConnectionType(ocmId: number | null | undefined): ConnectorType {
   switch (ocmId) {
     case 1:

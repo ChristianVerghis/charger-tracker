@@ -1,4 +1,4 @@
-# project.yml — dashboard manifest (auto-read by ~/dev/dashboard)
+# project.yml — manifest for a local dev dashboard
 name: charger-tracker
 kind: service
 status: dormant   # v1 feature-complete, launch checklist pending (Vercel deploy, .ca domain)
@@ -11,7 +11,6 @@ links:
   - { label: "Open app →", href: "http://localhost:3000", primary: true }
   - { label: "GitHub", href: "https://github.com/ChristianVerghis/charger-tracker" }
   - { label: "Launch checklist", path: "GOALS.md" }
-  - { label: "Spec (EV-Network)", href: "/files/EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md" }
   - { label: "Open Charge Map", href: "https://openchargemap.org/" }
 actions:
   check: pnpm check

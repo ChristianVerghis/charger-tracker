@@ -1,12 +1,9 @@
 // Compact attribution footer. OSM ToS requires a visible attribution; OCM
 // data is CC-BY-SA so they need credit too.
 //
-// The repo lives at https://github.com/ChristianVerghis/charger-tracker but
-// is private until launch. Flip GITHUB_URL on when the repo flips to public —
-// a footer link returning 404 is worse than no link.
-
-const GITHUB_URL: string | null = null;
-// const GITHUB_URL = 'https://github.com/ChristianVerghis/charger-tracker';
+// Set to null to hide the link if the repo ever goes private again — a footer
+// link returning 404 is worse than no link.
+const GITHUB_URL: string | null = 'https://github.com/ChristianVerghis/charger-tracker';
 
 export function Footer() {
   return (

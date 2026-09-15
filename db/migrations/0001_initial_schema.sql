@@ -1,6 +1,6 @@
 -- 0001_initial_schema.sql
 -- Initial schema for charger-tracker. Apply in Supabase via SQL editor or `supabase db push`.
--- See ../EV-Network/02_credibility_builds/project_01_charger_tracker/spec.md for the data-model sketch.
+-- Data model: networks -> stations -> connectors -> status_probes, plus ev_models. Summary in README.md.
 
 create extension if not exists postgis;
 create extension if not exists pgcrypto;  -- gen_random_uuid()
